@@ -18,12 +18,12 @@
 /**
 Fine Offset Electronics WS85 weather station.
 
-The WS85 is a WS90 with the addition of a piezoelectric rain gauge.
+The WS85 is a WS90 with the removal of temperature, humidity, lux and uv.
 Data bytes 1-13 are the same between the two models.  The new rain data
 is in bytes 16-20, with bytes 19 and 20 reporting total rain.  Bytes
 17 and 18 are affected by rain, but it is unknown what they report.  Byte
-21 reports the voltage of the super cap. And the checksum and CRC
-have been moved to bytes 30 and 31.  What is reported in the other
+17 reports the voltage of the super cap. And the checksum and CRC
+have been moved to bytes 27 and 26.  What is reported in the other
 bytes is unknown at this time.
 
 Also sold by EcoWitt.
@@ -44,7 +44,7 @@ Packet layout:
 - W = wind speed, lowest 8 bits of wind speed, m/s, scale 10
 - D = wind bearing, lowest 8 bits of wind bearing, range 0-359 deg, 0x1ff if invalid
 - G = wind gust, lowest 8 bits of wind gust, m/s, scale 10
-- U = unknown (bytes 14 and 15 appear to be fixed at 3f ff)
+- U = unknown
 - R = rain total (R3 << 8 | R4) * 0.1 mm
 - RS = rain start dection ((R1 & 0x10) >>4), 1 = raining, 0 = not raining
 - S = super cap voltage, unit of 0.1V, lower 6 bits, mask 0x3f
@@ -80,7 +80,7 @@ static int fineoffset_ws85_decode(r_device *decoder, bitbuffer_t *bitbuffer)
     // Extract package data
     bitbuffer_extract_bytes(bitbuffer, 0, bit_offset, b, sizeof(b) * 8);
 
-    if (b[0] != 0x85) // Check for family code 0x90
+    if (b[0] != 0x85) // Check for family code 0x85
         return DECODE_ABORT_EARLY;
 
     decoder_logf(decoder, 1, __func__, "WS85 detected, buffer is %u bits length", bitbuffer->bits_per_row[0]);
